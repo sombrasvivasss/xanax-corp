@@ -51,14 +51,14 @@ export const members: Member[] = [
     link: "https://guns.lol/remilputo",
     github: "not available",
     discord_id: "866411256679628851",
-    timezone: "America/Chile",
+    timezone: "America/Santiago",
   },
   {
     name: "lin",
     link: "https://rentry.co/linsitozz",
     github: "not available",
     discord_id: "1234039234780991559",
-    timezone: "America/United_States",
+    timezone: "America/New_York",
   },
 
 ].sort((a, b) => {

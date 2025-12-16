@@ -26,12 +26,17 @@ const Player = dynamic(() => import('lottie-react'), { ssr: false });
 
 const getLocalTime = (timezone?: string) => {
   if (!timezone) return null;
-  return new Intl.DateTimeFormat("en-US", {
-    timeZone: timezone,
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  }).format(new Date());
+  try {
+    return new Intl.DateTimeFormat("en-US", {
+      timeZone: timezone,
+      hour: "numeric",
+      minute: "numeric",
+      hour12: true,
+    }).format(new Date());
+  } catch (error) {
+    console.error(`Error formatting time for timezone: ${timezone}`, error);
+    return null;
+  }
 };
 
 
@@ -60,6 +65,8 @@ const extractSpotifyColor = async (
     return null;
   }
 };
+
+
 
 export default function Home() {
   const [selectedMember, setSelectedMember] = useState<Member | null>(null),
@@ -442,6 +449,8 @@ export default function Home() {
 
   return (
     <div className="font-kode w-full min-h-screen flex items-center justify-center gradient-bg relative">
+
+
       <motion.div
         className="absolute top-4 left-4"
         initial={{ opacity: 0 }}
@@ -467,494 +476,514 @@ export default function Home() {
           className="flex-1 flex flex-col items-center justify-center gap-6 w-full"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <motion.div className="flex flex-col items-center justify-center gap-4 w-full">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                duration: 1,
-                delay: 0.2,
-                ease: [0.175, 0.885, 0.32, 1.275],
-              }}
-              className="flex flex-col items-center justify-center"
-            >
-
-              <motion.span
-                className="text-3xl font-bold mt-4"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+          <Link href="https://github.com/xanaxx-LLC" target="_blank">
+            <div className="bg-white/10 p-1.5 rounded-full hover:bg-white/20 transition-all duration-300">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="#a0a0a0"
               >
-                xanaxx
-              </motion.span>
-            </motion.div>
-          </motion.div>
-
+                <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+              </svg>
+            </div>
+          </Link>
+        </motion.div>
+        <div className="container mx-auto flex flex-col gap-6 p-6">
           <motion.div
-            className="flex flex-col gap-4 w-full max-w-2xl mx-auto"
+            className="flex-1 flex flex-col items-center justify-center gap-6 w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="grid grid-cols-3 gap-6 w-full max-w-lg mx-auto">
-              {members.slice(0, 3).map((member, index) => {
-                const time = getLocalTime(member.timezone);
-                return (
-                  <motion.div
-                    key={member.name}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.7,
-                      delay: 0.8 + index * 0.1,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                    className="flex flex-1"
-                  >
-                    <TiltCard
-                      className="px-5 py-1.5 cursor-pointer transition-all hover:bg-white/10 bg-transparent relative w-full border-white/10"
-                      onClick={() => handleMemberSelect(member)}
-                      tiltIntensity={15}
-                    >
-                      <div className="flex flex-col items-center justify-center gap-1">
-                        <div className="flex items-center justify-center gap-2">
-                          {member.discord_id && (
-                            renderAvatar(memberData[member.name], !memberData[member.name]?.discord_data)
-                          )}
-                          <span className="text-base font-medium whitespace-nowrap">
-                            {member.name}
-                            {memberData[member.name]?.discord_data?.spotify && (
-                              <motion.div
-                                initial={{ opacity: 0, scale: 0.5 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
-                                className="inline-block ml-1.5 text-white/60"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  viewBox="0 0 24 24"
-                                  fill="currentColor"
-                                  className="w-3.5 h-3.5"
-                                >
-                                  <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.684 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
-                                </svg>
-                              </motion.div>
-                            )}
-                          </span>
-                        </div>
-                        {time && (
-                          <div className="text-[10px] text-white/40 font-mono">
-                            {time}
-                          </div>
-                        )}
-                      </div>
-                    </TiltCard>
-                  </motion.div>
-                )
-              })}
-            </div>
+            <motion.div className="flex flex-col items-center justify-center gap-4 w-full">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  duration: 1,
+                  delay: 0.2,
+                  ease: [0.175, 0.885, 0.32, 1.275],
+                }}
+                className="flex flex-col items-center justify-center"
+              >
+
+                <motion.span
+                  className="text-3xl font-bold mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+                >
+                  xanaxx
+                </motion.span>
+              </motion.div>
+            </motion.div>
 
             <motion.div
-              className="grid grid-cols-2 sm:grid-cols-3 gap-1.5"
+              className="flex flex-col gap-4 w-full max-w-2xl mx-auto"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
             >
-              {members.slice(3).map((member, index) => {
-                const time = getLocalTime(member.timezone);
-                return (
-                  <motion.div
-                    key={member.name}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{
-                      duration: 0.6,
-                      delay: 1.0 + index * 0.03,
-                      ease: "easeOut",
-                    }}
-                    whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
-                    className="flex items-center gap-1"
-                  >
-                    <TiltCard
-                      className="grow px-3 py-2 cursor-pointer transition-all hover:bg-white/10 bg-transparent relative border-white/10"
-                      onClick={() => handleMemberSelect(member)}
-                      tiltIntensity={10}
-                    >
-                      <div className="flex flex-col gap-0.5">
-                        <div className="flex items-center gap-2 w-full">
-                          {member.discord_id && (
-                            renderAvatar(memberData[member.name], !memberData[member.name]?.discord_data)
-                          )}
-                          <span className="text-sm flex items-center gap-1.5 flex-1 justify-center">
-                            {member.name}
-                            <motion.div
-                              initial={{ opacity: 0, scale: 0.5, width: 0, rotate: 0 }}
-                              animate={{
-                                opacity: memberData[member.name]?.discord_data?.spotify ? 1 : 0,
-                                scale: memberData[member.name]?.discord_data?.spotify ? 1 : 0.5,
-                                width: memberData[member.name]?.discord_data?.spotify ? "auto" : 0,
-                              }}
-                              transition={{
-                                duration: 0.3,
-                                ease: "easeInOut"
-                              }}
-                              className="text-white/60 overflow-hidden"
-                            >
-                              <Player
-                                autoplay
-                                loop
-                                animationData={music}
-                                style={{ width: 15, height: 15 }}
-                                rendererSettings={{
-                                  preserveAspectRatio: "xMidYMid slice",
-                                }}
-                              />
-                            </motion.div>
-                          </span>
-                        </div>
-                        {time && (
-                          <div className="text-[9px] text-white/30 font-mono text-center w-full">
-                            {time}
-                          </div>
-                        )}
-                      </div>
-                    </TiltCard>
-
-                    {(index + 1) % 3 !== 0 && index !== members.length - 3 && (
-                      <span className="text-white/20 hidden sm:block w-4 text-center">
-                        •
-                      </span>
-                    )}
-                  </motion.div>
-                )
-              })}
-            </motion.div>
-          </motion.div>
-        </motion.div>
-
-        <Dialog
-          open={!!selectedMember}
-          onOpenChange={(open) => !open && setSelectedMember(null)}
-        >
-          <DialogContent className="max-w-[90vw] sm:max-w-md bg-background">
-            <motion.div
-              className="flex flex-col"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
-            >
-              {currentMemberData && (
-                <>
-                  <div className="flex items-start gap-4">
+              <div className="grid grid-cols-3 gap-6 w-full max-w-lg mx-auto">
+                {members.slice(0, 3).map((member, index) => {
+                  const time = getLocalTime(member.timezone);
+                  return (
                     <motion.div
-                      className="relative self-center"
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ duration: 0.5, ease: "easeOut" }}
-                    >
-                      <div className="w-20 h-20 rounded-full overflow-hidden bg-white/5">
-                        {getAvatarUrl(currentMemberData) ? (
-                          <img
-                            src={getAvatarUrl(currentMemberData) ?? undefined}
-                            alt={currentMemberData.name}
-                            width={80}
-                            height={80}
-                            className="object-cover w-full h-full"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-2xl font-bold">
-                            {currentMemberData.name[0]}
-                          </div>
-                        )}
-                      </div>
-                      {currentMemberData.discord_data &&
-                        renderStatusIndicator(currentMemberData, "lg")}
-                    </motion.div>
-
-                    <motion.div
-                      className="flex flex-col flex-1 min-h-[80px] justify-center"
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.5,
-                        delay: 0.1,
-                        ease: "easeOut",
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <DialogTitle className="flex items-center gap-2">
-                          <span className="font-semibold">
-                            {currentMemberData.name}
-                          </span>
-                          {currentMemberData.link &&
-                            currentMemberData.link !== "#" && (
-                              <Link
-                                href={currentMemberData.link}
-                                target="_blank"
-                                className="text-white/40 hover:text-white/80 transition-colors duration-300"
-                              >
-                                <svg
-                                  className="w-4 h-4"
-                                  viewBox="0 0 15 15"
-                                  fill="none"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                >
-                                  <path
-                                    d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 12.7761 8 12.5 8C12.2239 8 12 8.22386 12 8.5V12H3V3H6.5C6.77614 3 7 2.77614 7 2.5C7 2.22386 6.77614 2 6.5 2H3ZM12.8536 2.14645C12.9015 2.19439 12.9377 2.24964 12.9621 2.30861C12.9861 2.36669 12.9996 2.4303 13 2.497L13 2.5V2.50049V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3.70711L6.85355 8.85355C6.65829 9.04882 6.34171 9.04882 6.14645 8.85355C5.95118 8.65829 5.95118 8.34171 6.14645 8.14645L11.2929 3H9.5C9.22386 3 9 2.77614 9 2.5C9 2.22386 9.22386 2 9.5 2H12.4999H12.5C12.5678 2 12.6324 2.01349 12.6914 2.03794C12.7504 2.06234 12.8056 2.09851 12.8536 2.14645Z"
-                                    fill="currentColor"
-                                    fillRule="evenodd"
-                                    clipRule="evenodd"
-                                  />
-                                </svg>
-                              </Link>
-                            )}
-                        </DialogTitle>
-                      </div>
-
-                      {currentMemberData.discord_data && (
-                        <div className="flex flex-col">
-                          <span
-                            className="text-sm text-white/60 cursor-pointer hover:text-white transition-colors flex items-center gap-1.5 group"
-                            onClick={() => {
-                              if (currentMemberData.discord_id) {
-                                navigator.clipboard.writeText(currentMemberData.discord_id);
-                                // You could add a toast here if you have a toast component
-                              }
-                            }}
-                            title="Click to copy ID"
-                          >
-                            @{currentMemberData.discord_data.discord_user.username}
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <path fillRule="evenodd" d="M11.986 3H12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 .586-1.414l1.5-1.5A2 2 0 0 1 5.5 2.5h3.5A2 2 0 0 1 11.986 3Zm-1.69 5.275a.75.75 0 0 0-1.077.017l-1.352 1.351a.75.75 0 0 0 0 1.06l1.352 1.352a.75.75 0 0 0 1.077.017l1.352-1.352.017-.016a.75.75 0 0 0 0-1.06l-1.37-1.37ZM6.746 4.5a.75.75 0 0 0-.214.22h.001l-1.5 1.5a.75.75 0 0 0 1.06 1.06l.207-.206v2.676a.75.75 0 0 0 1.5 0v-2.676l.207.206a.75.75 0 0 0 1.06-1.06l-1.5-1.5a.75.75 0 0 0-.821-.214Z" clipRule="evenodd" />
-                            </svg>
-                          </span>
-                          {currentMemberData.timezone && (
-                            <span className="text-xs text-white/40 font-mono mt-0.5">
-                              {getLocalTime(currentMemberData.timezone)}
-                            </span>
-                          )}
-                        </div>
-                      )}
-
-                      {currentMemberData.discord_data?.activities && (
-                        <div className="mt-1">
-                          {renderActivities(
-                            currentMemberData.discord_data.activities,
-                          )}
-                        </div>
-                      )}
-                    </motion.div>
-                  </div>
-
-                  {currentMemberData.github && currentMemberData.stats && (
-                    <motion.div
-                      className="mt-4 pt-4 border-t border-white/10"
-                      initial={{ opacity: 0, y: 10 }}
+                      key={member.name}
+                      initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        duration: 0.5,
-                        delay: 0.2,
+                        duration: 0.7,
+                        delay: 0.8 + index * 0.1,
                         ease: "easeOut",
                       }}
+                      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                      className="flex flex-1"
                     >
-                      <div className="flex items-center gap-2">
-                        <Link
-                          href={`https://github.com/${currentMemberData.github}`}
-                          target="_blank"
-                          className="text-sm flex items-center gap-1.5 text-white/60 hover:text-white/80 transition-colors duration-300"
-                        >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 16 16"
-                            width="16"
-                            height="16"
-                            fill="currentColor"
-                          >
-                            <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
-                          </svg>
-                          <span>@{currentMemberData.github}</span>
-                        </Link>
-                        <div className="flex gap-2 text-xs">
-                          <Link
-                            href={`https://github.com/${currentMemberData.github}?tab=followers`}
-                            target="_blank"
-                            className="bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-full text-white/60 transition-colors duration-300"
-                          >
-                            {currentMemberData.stats.followers} followers
-                          </Link>
-                          <Link
-                            href={`https://github.com/${currentMemberData.github}?tab=repositories`}
-                            target="_blank"
-                            className="bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-full text-white/60 transition-colors duration-300"
-                          >
-                            {currentMemberData.stats.repos} repos
-                          </Link>
-                          {currentMemberData.stats.stars > 4 && (
-                            <div className="bg-white/5 px-2 py-0.5 rounded-full text-white/60 flex items-center gap-1">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 16 16"
-                                width="12"
-                                height="12"
-                                fill="currentColor"
-                              >
-                                <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
-                              </svg>
-                              {currentMemberData.stats.stars}
+                      <TiltCard
+                        className="px-5 py-1.5 cursor-pointer transition-all hover:bg-white/10 bg-transparent relative w-full border-white/10"
+                        onClick={() => handleMemberSelect(member)}
+                        tiltIntensity={15}
+                      >
+                        <div className="flex flex-col items-center justify-center gap-1">
+                          <div className="flex items-center justify-center gap-2">
+                            {member.discord_id && (
+                              renderAvatar(memberData[member.name], !memberData[member.name]?.discord_data)
+                            )}
+                            <span className="text-base font-medium whitespace-nowrap">
+                              {member.name}
+                              {memberData[member.name]?.discord_data?.spotify && (
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.5 }}
+                                  animate={{ opacity: 1, scale: 1 }}
+                                  exit={{ opacity: 0, scale: 0.5 }}
+                                  className="inline-block ml-1.5 text-white/60"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    className="w-3.5 h-3.5"
+                                  >
+                                    <path d="M5.566 4.657A4.505 4.505 0 016.75 4.5h10.5c.41 0 .806.055 1.183.157A3 3 0 0015.75 3h-7.5a3 3 0 00-2.684 1.657zM2.25 12a3 3 0 013-3h13.5a3 3 0 013 3v6a3 3 0 01-3 3H5.25a3 3 0 01-3-3v-6zM5.25 7.5c-.41 0-.806.055-1.184.157A3 3 0 016.75 6h10.5a3 3 0 012.684 1.657A4.505 4.505 0 0018.75 7.5H5.25z" />
+                                  </svg>
+                                </motion.div>
+                              )}
+                            </span>
+                          </div>
+                          {time && (
+                            <div className="text-[10px] text-white/40 font-mono">
+                              {time}
                             </div>
                           )}
                         </div>
-                      </div>
+                      </TiltCard>
                     </motion.div>
-                  )}
+                  )
+                })}
+              </div>
 
-                  {currentMemberData.projects &&
-                    currentMemberData.projects.length > 0 &&
-                    (currentMemberData.projects[0].type !== "github" ||
-                      (currentMemberData.github &&
-                        currentMemberData.stats)) && (
+              <motion.div
+                className="grid grid-cols-2 sm:grid-cols-3 gap-1.5"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1, ease: "easeOut" }}
+              >
+                {members.slice(3).map((member, index) => {
+                  const time = getLocalTime(member.timezone);
+                  return (
+                    <motion.div
+                      key={member.name}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        duration: 0.6,
+                        delay: 1.0 + index * 0.03,
+                        ease: "easeOut",
+                      }}
+                      whileHover={{ scale: 1.05, transition: { duration: 0.2 } }}
+                      className="flex items-center gap-1"
+                    >
+                      <TiltCard
+                        className="grow px-3 py-2 cursor-pointer transition-all hover:bg-white/10 bg-transparent relative border-white/10"
+                        onClick={() => handleMemberSelect(member)}
+                        tiltIntensity={10}
+                      >
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-2 w-full">
+                            {member.discord_id && (
+                              renderAvatar(memberData[member.name], !memberData[member.name]?.discord_data)
+                            )}
+                            <span className="text-sm flex items-center gap-1.5 flex-1 justify-center">
+                              {member.name}
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.5, width: 0, rotate: 0 }}
+                                animate={{
+                                  opacity: memberData[member.name]?.discord_data?.spotify ? 1 : 0,
+                                  scale: memberData[member.name]?.discord_data?.spotify ? 1 : 0.5,
+                                  width: memberData[member.name]?.discord_data?.spotify ? "auto" : 0,
+                                }}
+                                transition={{
+                                  duration: 0.3,
+                                  ease: "easeInOut"
+                                }}
+                                className="text-white/60 overflow-hidden"
+                              >
+                                <Player
+                                  autoplay
+                                  loop
+                                  animationData={music}
+                                  style={{ width: 15, height: 15 }}
+                                  rendererSettings={{
+                                    preserveAspectRatio: "xMidYMid slice",
+                                  }}
+                                />
+                              </motion.div>
+                            </span>
+                          </div>
+                          {time && (
+                            <div className="text-[9px] text-white/30 font-mono text-center w-full">
+                              {time}
+                            </div>
+                          )}
+                        </div>
+                      </TiltCard>
+
+                      {(index + 1) % 3 !== 0 && index !== members.length - 3 && (
+                        <span className="text-white/20 hidden sm:block w-4 text-center">
+                          •
+                        </span>
+                      )}
+                    </motion.div>
+                  )
+                })}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          <Dialog
+            open={!!selectedMember}
+            onOpenChange={(open) => !open && setSelectedMember(null)}
+          >
+            <DialogContent className="max-w-[90vw] sm:max-w-md bg-background">
+              <motion.div
+                className="flex flex-col"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+              >
+                {currentMemberData && (
+                  <>
+                    <div className="flex items-start gap-4">
+                      <motion.div
+                        className="relative self-center"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.5, ease: "easeOut" }}
+                      >
+                        <div className="w-20 h-20 rounded-full overflow-hidden bg-white/5">
+                          {getAvatarUrl(currentMemberData) ? (
+                            <img
+                              src={getAvatarUrl(currentMemberData) ?? undefined}
+                              alt={currentMemberData.name}
+                              width={80}
+                              height={80}
+                              className="object-cover w-full h-full"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-2xl font-bold">
+                              {currentMemberData.name[0]}
+                            </div>
+                          )}
+                        </div>
+                        {currentMemberData.discord_data &&
+                          renderStatusIndicator(currentMemberData, "lg")}
+                      </motion.div>
+
+                      <motion.div
+                        className="flex flex-col flex-1 min-h-[80px] justify-center"
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.5,
+                          delay: 0.1,
+                          ease: "easeOut",
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <DialogTitle className="flex items-center gap-2">
+                            <span className="font-semibold">
+                              {currentMemberData.name}
+                            </span>
+                            {currentMemberData.link &&
+                              currentMemberData.link !== "#" && (
+                                <Link
+                                  href={currentMemberData.link}
+                                  target="_blank"
+                                  className="text-white/40 hover:text-white/80 transition-colors duration-300"
+                                >
+                                  <svg
+                                    className="w-4 h-4"
+                                    viewBox="0 0 15 15"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                  >
+                                    <path
+                                      d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 12.7761 8 12.5 8C12.2239 8 12 8.22386 12 8.5V12H3V3H6.5C6.77614 3 7 2.77614 7 2.5C7 2.22386 6.77614 2 6.5 2H3ZM12.8536 2.14645C12.9015 2.19439 12.9377 2.24964 12.9621 2.30861C12.9861 2.36669 12.9996 2.4303 13 2.497L13 2.5V2.50049V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3.70711L6.85355 8.85355C6.65829 9.04882 6.34171 9.04882 6.14645 8.85355C5.95118 8.65829 5.95118 8.34171 6.14645 8.14645L11.2929 3H9.5C9.22386 3 9 2.77614 9 2.5C9 2.22386 9.22386 2 9.5 2H12.4999H12.5C12.5678 2 12.6324 2.01349 12.6914 2.03794C12.7504 2.06234 12.8056 2.09851 12.8536 2.14645Z"
+                                      fill="currentColor"
+                                      fillRule="evenodd"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                </Link>
+                              )}
+                          </DialogTitle>
+                        </div>
+
+                        {currentMemberData.discord_data && (
+                          <div className="flex flex-col">
+                            <span
+                              className="text-sm text-white/60 cursor-pointer hover:text-white transition-colors flex items-center gap-1.5 group"
+                              onClick={() => {
+                                if (currentMemberData.discord_id) {
+                                  navigator.clipboard.writeText(currentMemberData.discord_id);
+                                  // You could add a toast here if you have a toast component
+                                }
+                              }}
+                              title="Click to copy ID"
+                            >
+                              @{currentMemberData.discord_data.discord_user.username}
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <path fillRule="evenodd" d="M11.986 3H12a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 .586-1.414l1.5-1.5A2 2 0 0 1 5.5 2.5h3.5A2 2 0 0 1 11.986 3Zm-1.69 5.275a.75.75 0 0 0-1.077.017l-1.352 1.351a.75.75 0 0 0 0 1.06l1.352 1.352a.75.75 0 0 0 1.077.017l1.352-1.352.017-.016a.75.75 0 0 0 0-1.06l-1.37-1.37ZM6.746 4.5a.75.75 0 0 0-.214.22h.001l-1.5 1.5a.75.75 0 0 0 1.06 1.06l.207-.206v2.676a.75.75 0 0 0 1.5 0v-2.676l.207.206a.75.75 0 0 0 1.06-1.06l-1.5-1.5a.75.75 0 0 0-.821-.214Z" clipRule="evenodd" />
+                              </svg>
+                            </span>
+                            {currentMemberData.timezone && (
+                              <span className="text-xs text-white/40 font-mono mt-0.5">
+                                {getLocalTime(currentMemberData.timezone)}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {currentMemberData.discord_data?.activities && (
+                          <div className="mt-1">
+                            {renderActivities(
+                              currentMemberData.discord_data.activities,
+                            )}
+                          </div>
+                        )}
+                      </motion.div>
+                    </div>
+
+                    {currentMemberData.github && currentMemberData.stats && (
                       <motion.div
                         className="mt-4 pt-4 border-t border-white/10"
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{
                           duration: 0.5,
-                          delay: 0.3,
+                          delay: 0.2,
                           ease: "easeOut",
                         }}
                       >
-                        <h3 className="text-sm font-medium mb-3">Projects</h3>
-                        <div className="grid gap-2">
-                          {currentMemberData.projects
-                            .slice((currentPage - 1) * 2, currentPage * 2)
-                            .map((project, idx) => (
-                              <motion.div
-                                key={project.name}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{
-                                  duration: 0.4,
-                                  delay: 0.4 + idx * 0.1,
-                                  ease: "easeOut",
-                                }}
-                              >
-                                <Link
-                                  href={project.url}
-                                  target="_blank"
-                                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 transition-colors duration-300 rounded-md p-2.5"
-                                >
-                                  <div className="w-8 h-8 shrink-0 rounded-md bg-white/10 flex items-center justify-center">
-                                    {project.icon ? (
-                                      <img
-                                        src={project.icon}
-                                        alt=""
-                                        className="w-full h-full rounded-md object-cover"
-                                      />
-                                    ) : project.type === "github" ? (
-                                      <svg
-                                        className="w-4 h-4 text-white/60"
-                                        viewBox="0 0 16 16"
-                                        fill="currentColor"
-                                      >
-                                        <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
-                                      </svg>
-                                    ) : (
-                                      <svg
-                                        className="w-4 h-4 text-white/60"
-                                        viewBox="0 0 15 15"
-                                        fill="currentColor"
-                                      >
-                                        <path
-                                          fillRule="evenodd"
-                                          clipRule="evenodd"
-                                          d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 12.7761 8 12.5 8C12.2239 8 12 8.22386 12 8.5V12H3V3H6.5C6.77614 3 7 2.77614 7 2.5C7 2.22386 6.77614 2 6.5 2H3ZM12.8536 2.14645C12.9015 2.19439 12.9377 2.24964 12.9621 2.30861C12.9861 2.36669 12.9996 2.4303 13 2.497L13 2.5V2.50049V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3.70711L6.85355 8.85355C6.65829 9.04882 6.34171 9.04882 6.14645 8.85355C5.95118 8.65829 5.95118 8.34171 6.14645 8.14645L11.2929 3H9.5C9.22386 3 9 2.77614 9 2.5C9 2.22386 9.22386 2 9.5 2H12.4999H12.5C12.5678 2 12.6324 2.01349 12.6914 2.03794C12.7504 2.06234 12.8056 2.09851 12.8536 2.14645Z"
-                                        />
-                                      </svg>
-                                    )}
-                                  </div>
-                                  <div className="flex flex-col min-w-0 flex-1">
-                                    <span className="text-sm font-medium break-words">
-                                      {project.name}
-                                    </span>
-                                    <span className="text-xs text-white/60 break-words">
-                                      {project.description}
-                                    </span>
-                                  </div>
-                                </Link>
-                              </motion.div>
-                            ))}
-                        </div>
-                        {currentMemberData?.projects?.length > 2 && (
-                          <motion.div
-                            className="flex justify-center gap-2 mt-4"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{
-                              duration: 0.5,
-                              delay: 0.6,
-                              ease: "easeOut",
-                            }}
+                        <div className="flex items-center gap-2">
+                          <Link
+                            href={`https://github.com/${currentMemberData.github}`}
+                            target="_blank"
+                            className="text-sm flex items-center gap-1.5 text-white/60 hover:text-white/80 transition-colors duration-300"
                           >
-                            {Array.from(
-                              {
-                                length: Math.ceil(
-                                  (currentMemberData?.projects?.length ?? 0) /
-                                  2,
-                                ),
-                              },
-                              (_, i) => (
-                                <motion.button
-                                  key={i + 1}
-                                  onClick={() => setCurrentPage(i + 1)}
-                                  className={`w-2 h-2 p-2 rounded-full relative transition-colors duration-300 ${currentPage === i + 1
-                                    ? "bg-white/60"
-                                    : "bg-white/10 hover:bg-white/20"
-                                    }`}
-                                  whileHover={{ scale: 1.2 }}
-                                  whileTap={{ scale: 0.9 }}
-                                  animate={
-                                    currentPage === i + 1
-                                      ? {
-                                        scale: [1, 1.2, 1],
-                                        transition: { duration: 0.5 },
-                                      }
-                                      : { scale: 1 }
-                                  }
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 16 16"
+                              width="16"
+                              height="16"
+                              fill="currentColor"
+                            >
+                              <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
+                            </svg>
+                            <span>@{currentMemberData.github}</span>
+                          </Link>
+                          <div className="flex gap-2 text-xs">
+                            <Link
+                              href={`https://github.com/${currentMemberData.github}?tab=followers`}
+                              target="_blank"
+                              className="bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-full text-white/60 transition-colors duration-300"
+                            >
+                              {currentMemberData.stats.followers} followers
+                            </Link>
+                            <Link
+                              href={`https://github.com/${currentMemberData.github}?tab=repositories`}
+                              target="_blank"
+                              className="bg-white/5 hover:bg-white/10 px-2 py-0.5 rounded-full text-white/60 transition-colors duration-300"
+                            >
+                              {currentMemberData.stats.repos} repos
+                            </Link>
+                            {currentMemberData.stats.stars > 4 && (
+                              <div className="bg-white/5 px-2 py-0.5 rounded-full text-white/60 flex items-center gap-1">
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 16 16"
+                                  width="12"
+                                  height="12"
+                                  fill="currentColor"
                                 >
-                                  <motion.span
-                                    className="absolute inset-0 flex items-center justify-center"
+                                  <path d="M8 .25a.75.75 0 0 1 .673.418l1.882 3.815 4.21.612a.75.75 0 0 1 .416 1.279l-3.046 2.97.719 4.192a.751.751 0 0 1-1.088.791L8 12.347l-3.766 1.98a.75.75 0 0 1-1.088-.79l.72-4.194L.818 6.374a.75.75 0 0 1 .416-1.28l4.21-.611L7.327.668A.75.75 0 0 1 8 .25Z" />
+                                </svg>
+                                {currentMemberData.stats.stars}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {currentMemberData.projects &&
+                      currentMemberData.projects.length > 0 &&
+                      (currentMemberData.projects[0].type !== "github" ||
+                        (currentMemberData.github &&
+                          currentMemberData.stats)) && (
+                        <motion.div
+                          className="mt-4 pt-4 border-t border-white/10"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{
+                            duration: 0.5,
+                            delay: 0.3,
+                            ease: "easeOut",
+                          }}
+                        >
+                          <h3 className="text-sm font-medium mb-3">Projects</h3>
+                          <div className="grid gap-2">
+                            {currentMemberData.projects
+                              .slice((currentPage - 1) * 2, currentPage * 2)
+                              .map((project, idx) => (
+                                <motion.div
+                                  key={project.name}
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{
+                                    duration: 0.4,
+                                    delay: 0.4 + idx * 0.1,
+                                    ease: "easeOut",
+                                  }}
+                                >
+                                  <Link
+                                    href={project.url}
+                                    target="_blank"
+                                    className="flex items-center gap-3 bg-white/5 hover:bg-white/10 transition-colors duration-300 rounded-md p-2.5"
+                                  >
+                                    <div className="w-8 h-8 shrink-0 rounded-md bg-white/10 flex items-center justify-center">
+                                      {project.icon ? (
+                                        <img
+                                          src={project.icon}
+                                          alt=""
+                                          className="w-full h-full rounded-md object-cover"
+                                        />
+                                      ) : project.type === "github" ? (
+                                        <svg
+                                          className="w-4 h-4 text-white/60"
+                                          viewBox="0 0 16 16"
+                                          fill="currentColor"
+                                        >
+                                          <path d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z" />
+                                        </svg>
+                                      ) : (
+                                        <svg
+                                          className="w-4 h-4 text-white/60"
+                                          viewBox="0 0 15 15"
+                                          fill="currentColor"
+                                        >
+                                          <path
+                                            fillRule="evenodd"
+                                            clipRule="evenodd"
+                                            d="M3 2C2.44772 2 2 2.44772 2 3V12C2 12.5523 2.44772 13 3 13H12C12.5523 13 13 12.5523 13 12V8.5C13 8.22386 12.7761 8 12.5 8C12.2239 8 12 8.22386 12 8.5V12H3V3H6.5C6.77614 3 7 2.77614 7 2.5C7 2.22386 6.77614 2 6.5 2H3ZM12.8536 2.14645C12.9015 2.19439 12.9377 2.24964 12.9621 2.30861C12.9861 2.36669 12.9996 2.4303 13 2.497L13 2.5V2.50049V5.5C13 5.77614 12.7761 6 12.5 6C12.2239 6 12 5.77614 12 5.5V3.70711L6.85355 8.85355C6.65829 9.04882 6.34171 9.04882 6.14645 8.85355C5.95118 8.65829 5.95118 8.34171 6.14645 8.14645L11.2929 3H9.5C9.22386 3 9 2.77614 9 2.5C9 2.22386 9.22386 2 9.5 2H12.4999H12.5C12.5678 2 12.6324 2.01349 12.6914 2.03794C12.7504 2.06234 12.8056 2.09851 12.8536 2.14645Z"
+                                          />
+                                        </svg>
+                                      )}
+                                    </div>
+                                    <div className="flex flex-col min-w-0 flex-1">
+                                      <span className="text-sm font-medium break-words">
+                                        {project.name}
+                                      </span>
+                                      <span className="text-xs text-white/60 break-words">
+                                        {project.description}
+                                      </span>
+                                    </div>
+                                  </Link>
+                                </motion.div>
+                              ))}
+                          </div>
+                          {currentMemberData?.projects?.length > 2 && (
+                            <motion.div
+                              className="flex justify-center gap-2 mt-4"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{
+                                duration: 0.5,
+                                delay: 0.6,
+                                ease: "easeOut",
+                              }}
+                            >
+                              {Array.from(
+                                {
+                                  length: Math.ceil(
+                                    (currentMemberData?.projects?.length ?? 0) /
+                                    2,
+                                  ),
+                                },
+                                (_, i) => (
+                                  <motion.button
+                                    key={i + 1}
+                                    onClick={() => setCurrentPage(i + 1)}
+                                    className={`w-2 h-2 p-2 rounded-full relative transition-colors duration-300 ${currentPage === i + 1
+                                      ? "bg-white/60"
+                                      : "bg-white/10 hover:bg-white/20"
+                                      }`}
+                                    whileHover={{ scale: 1.2 }}
+                                    whileTap={{ scale: 0.9 }}
                                     animate={
                                       currentPage === i + 1
-                                        ? { opacity: 1 }
-                                        : { opacity: 0.7 }
+                                        ? {
+                                          scale: [1, 1.2, 1],
+                                          transition: { duration: 0.5 },
+                                        }
+                                        : { scale: 1 }
                                     }
                                   >
                                     <motion.span
-                                      className="w-3 h-3 rounded-full"
-                                      layoutId="activeDot"
-                                      transition={{
-                                        type: "spring",
-                                        stiffness: 300,
-                                        damping: 30,
-                                      }}
-                                    />
-                                  </motion.span>
-                                </motion.button>
-                              ),
-                            )}
-                          </motion.div>
-                        )}
-                      </motion.div>
-                    )}
-                </>
-              )}
-            </motion.div>
-          </DialogContent>
-        </Dialog>
+                                      className="absolute inset-0 flex items-center justify-center"
+                                      animate={
+                                        currentPage === i + 1
+                                          ? { opacity: 1 }
+                                          : { opacity: 0.7 }
+                                      }
+                                    >
+                                      <motion.span
+                                        className="w-3 h-3 rounded-full"
+                                        layoutId="activeDot"
+                                        transition={{
+                                          type: "spring",
+                                          stiffness: 300,
+                                          damping: 30,
+                                        }}
+                                      />
+                                    </motion.span>
+                                  </motion.button>
+                                ),
+                              )}
+                            </motion.div>
+                          )}
+                        </motion.div>
+                      )}
+                  </>
+                )}
+              </motion.div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
-    </div>
-  );
+      );
 }
