@@ -29,7 +29,7 @@ export const members: Member[] = [
     name: "derreick",
     link: "https://derreick.dev",
     github: "derreick",
-    discord_id: "1124737231496683543",
+    discord_id: "1426228733022572787",
     timezone: "America/Mexico_City",
   },
   {
@@ -39,9 +39,30 @@ export const members: Member[] = [
     discord_id: "1435000408924750006",
     timezone: "America/Mexico_City",
   },
+  {
+    name: "ritualwraith",
+    link: "https://e.rich/binance",
+    github: "sinresentimientos",
+    discord_id: "1380985670406770748",
+    timezone: "America/Buenos_Aires",
+  },
+  {
+    name: "remi",
+    link: "https://guns.lol/remilputo",
+    github: "not available",
+    discord_id: "866411256679628851",
+    timezone: "America/Chile",
+  },
+  {
+    name: "lin",
+    link: "https://rentry.co/linsitozz",
+    github: "not available",
+    discord_id: "1234039234780991559",
+    timezone: "America/United_States",
+  },
 
 ].sort((a, b) => {
-  const topOrder = ["odd", "lockfile", "abdiel", "derreick"];
+  const topOrder = ["odd", "lockfile", "abdiel", "ritualwraith", "remi", "lin", "derreick"];
   if (topOrder.includes(a.name) && topOrder.includes(b.name)) return topOrder.indexOf(a.name) - topOrder.indexOf(b.name);
   if (topOrder.includes(a.name)) return -1;
   if (topOrder.includes(b.name)) return 1;
