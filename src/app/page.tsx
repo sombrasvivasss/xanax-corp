@@ -985,5 +985,6 @@ export default function Home() {
           </Dialog>
         </div>
       </div>
-      );
+    </div>
+  );
 }
