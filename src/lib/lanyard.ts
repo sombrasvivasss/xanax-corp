@@ -124,7 +124,10 @@ export class LanyardWebSocket {
     this.subscribers.set(discord_id, callback);
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(
-        JSON.stringify({ op: 2, d: { subscribe_to_ids: [discord_id] } }),
+        JSON.stringify({
+          op: 2,
+          d: { subscribe_to_ids: Array.from(this.subscribers.keys()) },
+        }),
       );
     }
   }
