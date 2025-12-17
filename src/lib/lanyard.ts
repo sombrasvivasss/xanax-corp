@@ -95,14 +95,25 @@ export class LanyardWebSocket {
           break;
 
         case 0:
-          if (
-            (payload.t === "INIT_STATE" || payload.t === "PRESENCE_UPDATE") &&
-            payload.d &&
-            payload.d.discord_user &&
-            payload.d.discord_user.id
-          ) {
-            const subscriber = this.subscribers.get(payload.d.discord_user.id);
-            if (subscriber) subscriber(payload.d);
+          if (payload.t === "INIT_STATE" || payload.t === "PRESENCE_UPDATE") {
+            // Handle single user update (PRESENCE_UPDATE or single-user INIT_STATE)
+            if (payload.d?.discord_user?.id) {
+              const subscriber = this.subscribers.get(payload.d.discord_user.id);
+              if (subscriber) subscriber(payload.d);
+              return;
+            }
+
+            // Handle multi-user INIT_STATE (object where keys are user IDs)
+            if (payload.t === "INIT_STATE" && payload.d) {
+              Object.values(payload.d).forEach((userData: any) => {
+                if (userData?.discord_user?.id) {
+                  const subscriber = this.subscribers.get(
+                    userData.discord_user.id,
+                  );
+                  if (subscriber) subscriber(userData);
+                }
+              });
+            }
           }
           break;
       }
