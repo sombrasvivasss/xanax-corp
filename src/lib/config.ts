@@ -62,7 +62,7 @@ export const members: Member[] = [
   },
 
 ].sort((a, b) => {
-  const topOrder = ["odd", "lockfile", "spraiiz", "abdiel", "ritualwraith", "remi", "lin"];
+  const topOrder = ["ending", "lockfile", "spraiiz", "abdiel", "ritualwraith", "remi", "lin"];
   if (topOrder.includes(a.name) && topOrder.includes(b.name)) return topOrder.indexOf(a.name) - topOrder.indexOf(b.name);
   if (topOrder.includes(a.name)) return -1;
   if (topOrder.includes(b.name)) return 1;
