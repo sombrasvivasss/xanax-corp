@@ -2,8 +2,8 @@ import type { Member } from "@/types/member";
 
 export const members: Member[] = [
   {
-    name: "odd",
-    link: "https://odd.dev/",
+    name: "ending",
+    link: "https://ending.dev/",
     github: "sombrasvivasss",
     discord_id: "1436451809903382599",
     projects: [
@@ -26,10 +26,10 @@ export const members: Member[] = [
     timezone: "America/Guayaquil",
   },
   {
-    name: "derreick",
-    link: "https://derreick.dev",
-    github: "derreick",
-    discord_id: "1426228733022572787",
+    name: "spraiiz",
+    link: "https://spraiiz.dev/",
+    github: "not available",
+    discord_id: "1141492642153250817",
     timezone: "America/Mexico_City",
   },
   {
@@ -62,7 +62,7 @@ export const members: Member[] = [
   },
 
 ].sort((a, b) => {
-  const topOrder = ["odd", "lockfile", "abdiel", "ritualwraith", "remi", "lin", "derreick"];
+  const topOrder = ["odd", "lockfile", "spraiiz", "abdiel", "ritualwraith", "remi", "lin"];
   if (topOrder.includes(a.name) && topOrder.includes(b.name)) return topOrder.indexOf(a.name) - topOrder.indexOf(b.name);
   if (topOrder.includes(a.name)) return -1;
   if (topOrder.includes(b.name)) return 1;
